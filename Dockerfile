@@ -53,11 +53,13 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Enable Apache mod_rewrite (if needed)
 RUN a2enmod rewrite
 
+# Set high limit for CLI (unlimited)
+RUN echo "memory_limit = -1" > /usr/local/etc/php/conf.d/cli-memory.ini
+# Set reasonable limit for Apache
+RUN echo "memory_limit = 512M" > /usr/local/etc/php/conf.d/apache-memory.ini
+
 # Install Playwright OS dependencies.
 RUN npx playwright install-deps
-
-# Install current browsers
-RUN npx playwright install
 
 # Used for PHPUnit functional tests.
 RUN CHROME_VERSION=$(curl -s https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json | jq -r '.channels.Stable.version') && \
@@ -70,5 +72,9 @@ RUN CHROME_VERSION=$(curl -s https://googlechromelabs.github.io/chrome-for-testi
     chmod +x /usr/local/bin/chromedriver && \
     rm -f chrome-linux64.zip chromedriver-linux64.zip && \
     rm -rf /usr/local/bin/chromedriver-linux64/
+
+# Use current date to bust cache
+# Install current browsers
+RUN date > /tmp/cache-bust && npx playwright install
 
 WORKDIR /var/www/html
