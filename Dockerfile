@@ -19,6 +19,7 @@ RUN apt-get install -y --no-install-recommends \
     jq \
     unzip \
     ca-certificates \
+    sudo \
     && apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
