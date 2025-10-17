@@ -56,6 +56,9 @@ RUN a2enmod rewrite
 # Install Playwright OS dependencies.
 RUN npx playwright install-deps
 
+# Install current browsers
+RUN npx playwright install
+
 # Used for PHPUnit functional tests.
 RUN CHROME_VERSION=$(curl -s https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json | jq -r '.channels.Stable.version') && \
     curl -L "https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux64/chrome-linux64.zip" -o chrome-linux64.zip && \
