@@ -1,5 +1,5 @@
 #p Testing image used for GitLab CI
-FROM php:8.3-apache-bookworm as base
+FROM php:8.3-apache-bookworm AS base
 
 # Install Node.js 24 (includes npm)
 RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - && \
@@ -20,6 +20,8 @@ RUN apt-get install -y --no-install-recommends \
     unzip \
     ca-certificates \
     sudo \
+    wget \
+    build-essential \
     && apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -46,6 +48,28 @@ RUN apt-get clean && \
     /var/tmp/* \
     /usr/share/doc/* \
     /usr/share/man/*
+
+# Download and compile latest SQLite
+RUN SQLITE_VERSION=3450000 && \
+    SQLITE_YEAR=2024 && \
+    wget https://www.sqlite.org/${SQLITE_YEAR}/sqlite-autoconf-${SQLITE_VERSION}.tar.gz && \
+    tar xzf sqlite-autoconf-${SQLITE_VERSION}.tar.gz && \
+    cd sqlite-autoconf-${SQLITE_VERSION} && \
+    ./configure --prefix=/usr/local && \
+    make -j$(nproc) && \
+    make install && \
+    ldconfig && \
+    cd .. && \
+    rm -rf sqlite-autoconf-${SQLITE_VERSION}*
+
+# Rebuild pdo_sqlite extension with new SQLite library
+RUN docker-php-source extract && \
+    cd /usr/src/php/ext/pdo_sqlite && \
+    phpize && \
+    ./configure --with-pdo-sqlite=/usr/local && \
+    make -j$(nproc) && \
+    make install && \
+    docker-php-source delete
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
