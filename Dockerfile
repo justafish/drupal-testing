@@ -1,5 +1,5 @@
 #p Testing image used for GitLab CI
-FROM php:8.3-apache as base
+FROM php:8.3-apache-bookworm as base
 
 # Install Node.js 24 (includes npm)
 RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - && \
