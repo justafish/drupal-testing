@@ -75,6 +75,6 @@ RUN CHROME_VERSION=$(curl -s https://googlechromelabs.github.io/chrome-for-testi
 
 # Use current date to bust cache
 # Install current browsers
-RUN date > /tmp/cache-bust && npx playwright install
+RUN date > /tmp/cache-bust && npx playwright install --with-deps
 
 WORKDIR /var/www/html
