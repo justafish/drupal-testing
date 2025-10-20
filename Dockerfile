@@ -22,6 +22,7 @@ RUN apt-get install -y --no-install-recommends \
     unzip \
     ca-certificates \
     sudo \
+    git \
     && apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
